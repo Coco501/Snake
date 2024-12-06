@@ -1,12 +1,4 @@
-#include <iostream>
-#include <cstdlib>
-#include <ncurses.h>
-
-bool gameOver;
-const int width = 10, height = 10;
-int x, y, fruitX, fruitY, score;
-enum Direction {stop = 0, left, right, up, down};
-Direction dir;
+#include "source.hpp"
 
 void setup(){
     srand(time(0));     // set random seed for rand()
@@ -14,29 +6,22 @@ void setup(){
     score = 0;          // initialize score to be 0
     dir = stop;         // snake stopped before any input
     x = width/2;        // start our snake in the middle of the window
-    y = height/2;
+    y = height/2 + 1;   // + 1 accounts for Score at the top
     fruitX = rand() % width; //start fruit in random spot
     fruitY = rand() % height;
+    while ((fruitX == x) && (fruitY = y)){ // make sure fruit does not start in same spot as snake
+        fruitX = rand() % width; 
+        fruitY = rand() % height;
+    }
 }
 
 void draw(){
-   // system("clear");                          // clear screen
-    char wallChar = '#';
-
-    for (int i = 0; i < (width + 2); i++)         // draw top wall of #
-        std::cout << wallChar;
-    std::cout << std::endl;
-
-    for (int i = 0; i < height; i++){   // draw all interior rows
-        std::cout << wallChar;
-        for (int j = 0; j < width; j++)
-            std:: cout << " ";
-        std::cout << wallChar << std::endl;
-    }
-
-    for (int i = 0; i < (width + 2); i++)         // draw bottom wall of #
-        std::cout << wallChar;
-    std::cout << std::endl; 
+    clear();
+    drawTopWall();
+    drawInterior();
+    drawBottomWall();
+    printScore();
+    refresh(); // refresh the screen to show new updates
 }
 
 void input(){
@@ -45,17 +30,29 @@ void input(){
 }
 
 void logic(){
-
+    
 }
 
 int main(){
+    initscr();
+    noecho();
+    curs_set(0);
+
     setup();
 
     while(!gameOver){
         draw();
         input();
         logic();
+        if (gameWon())
+            gameOver = true;
     }
 
+    if (gameWon())
+        youWon();
+    else
+        youLost();
+    
+    endwin(); // end window
     return 0;
 }
