@@ -1,20 +1,21 @@
 #include <iostream>
 #include <cstdlib>
 #include <ncurses.h>
+#include <unistd.h>
 
 bool gameOver;
 const int width = 39, height = 19;
 int x, y, fruitX, fruitY, score;
 enum eDirection {stop = 0, left, right, up, down};
 eDirection dir;
-char topWallChar = '-';
-char sideWallChar = '|';
-int winScore = 100;
+char topWallChar = '#';
+char sideWallChar = '#';
+int winScore = 25;
 
 // snake coordinates
-int tailX[100];
-int tailY[100]; 
-int nTail;
+int tailX[100]; // tail x coord
+int tailY[100]; // tail y coord
+int nTail;      // number of tail segments
 
 /// @brief Print the player's score, centered to the screen
 void printScore(){
@@ -28,48 +29,45 @@ void printScore(){
 
 /// @brief Draw the top wall border
 void drawTopWall(){
-    for (int i = 0; i < width + 2; i++)
+    for (int i = 0; i < (width + 2); i+=2){
         mvaddch(1, i, topWallChar);
-        //std::cout << wallChar << " ";
-    //std::cout << std::endl;
+        mvaddch(1, i+1, ' ');
+    }
 }
 
 /// @brief Draw the bottom wall border
 void drawBottomWall(){
-    for (int i = 0; i < width + 2; i++)
-        mvaddch(height + 1, i, topWallChar);
+    for (int i = 0; i < (width + 2); i+=2){
+        mvaddch(height + 2, i, topWallChar);
+        mvaddch(height + 2, i+1, ' ');
+    }
 }
 
 /// @brief Draw the interior rows of the screen
 void drawInterior(){
     for (int i = 2; i < height + 2; i++){          
-        //std::cout << wallChar; 
         mvaddch(i, 0, sideWallChar);
 
-        for (int j = 0; j < width; j++)
+        for (int j = 1; j < width + 1; j++)
             if (y == i && x == j)                // check for snake
-                //std::cout << "o";
                 mvaddch(i, j, 'o');
 
             else if (fruitY == i && fruitX == j) // check for fruit
-                //std::cout << "•";
-                mvprintw(i, j, "•");
+                mvprintw(i, j, "x");
 
             else                                 // print blank
-                //std:: cout << " ";              
                 mvaddch(i, j, ' ');
 
-        //std::cout << wallChar << std::endl;
         mvaddch(i, width + 1, sideWallChar);
     }
 }
 
-/// @brief Check if player has won by checking winScore
-bool gameWon(){
-    if (score == winScore)
-        return true;
-    return false;
-}
+// /// @brief Check if player has won by checking winScore
+// bool gameWon(){
+    // if (score == winScore)
+        // return true;
+    // return false;
+// }
 
 /// @brief Print out the "You won!" screen
 void youWon(){
