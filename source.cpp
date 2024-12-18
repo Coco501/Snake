@@ -54,6 +54,11 @@ void input(){
 }
 
 void logic(){
+    // previous head positions
+    int prevX = x, prevY = y;
+    int prev2X, prev2Y;
+
+    // move head
     switch (dir){
         case up:
             y--;
@@ -71,15 +76,61 @@ void logic(){
             break;
     }
 
-    if (x <= 0 || x >= width + 1 || y <= 1 || y >= height + 2){ // check for wall collision
+    // check for wall collision
+    if (x <= 0 || x >= width + 1 || y <= 1 || y >= height + 2){
         gameOver = true; // hit a wall
         return; 
     }
 
-    if (x == fruitX && y == fruitY){ // check for fruit eating
-        score++;
+    // check for tail collision
+    for (int i = 0; i < nTail; i++){
+        if (tailX[i] == x && tailY[i] == y){
+            gameOver = true;
+            return;
+        }
+    }
+
+    // move tail
+    for (int i = 0; i < nTail; i++){
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
+
+    // check for fruit eating
+    if (x == fruitX && y == fruitY){ 
+        score++;   // increment score
+        nTail++;   // increase tail length
+        // new fruit position
         fruitX = 1 + rand() % width;
         fruitY = 2 + rand() % height;
+        // ensure fruit does not spawn on snake
+        while (true){
+            bool onSnake = false;
+            if (fruitX == x && fruitY == y)
+                onSnake = true;
+            else {
+                for (int i = 0; i < nTail; i++){
+                    if (fruitX == tailX[i] && fruitY == tailY[i]){
+                        onSnake = true;
+                        break;
+                    }
+                }
+            }
+            if (onSnake == false)
+                break;
+
+            else{
+                fruitX = 1 + rand() % width;
+                fruitY = 2 + rand() % height;
+            }
+        }
+
+
+
         while ((fruitX == x) && (fruitY = y)){
             fruitX = 1 + rand() % width; 
             fruitY = 2 + rand() % height; 
@@ -102,6 +153,7 @@ int main(){
         logic();
         if (score == winScore)
             gameOver = true;
+        draw();
         usleep(150000);
     }
 

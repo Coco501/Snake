@@ -4,13 +4,18 @@
 #include <unistd.h>
 
 bool gameOver;
-const int width = 39, height = 19;
+// regular terminal cell width
+//const int width = 39, height = 19;
+
+// square terminal cell width 
+const int width = 19, height = 19;
+
 int x, y, fruitX, fruitY, score;
 enum eDirection {stop = 0, left, right, up, down};
 eDirection dir;
 char topWallChar = '#';
 char sideWallChar = '#';
-int winScore = 25;
+int winScore = 10;
 
 // snake coordinates
 int tailX[100]; // tail x coord
@@ -21,25 +26,33 @@ int nTail;      // number of tail segments
 void printScore(){
     int centerX = (width - 7) / 2;
     mvprintw(0, centerX, "Score: %d", score);
-    //for (int i = 0; i < (width - 7)/2; i++) // center the "Score: x" according to the width by printing appropriate # of spaces
-        ////std::cout << " ";
-
-    //std::cout << "Score: " << score << std::endl;
 }
 
 /// @brief Draw the top wall border
 void drawTopWall(){
-    for (int i = 0; i < (width + 2); i+=2){
+    // regular terminal cell width
+    //for (int i = 0; i < (width + 2); i+=2){
+        //mvaddch(1, i, topWallChar);
+        //mvaddch(1, i+1, ' ');
+    //}
+
+    // square terminal cell width
+    for (int i = 0; i < (width + 2); i++){
         mvaddch(1, i, topWallChar);
-        mvaddch(1, i+1, ' ');
     }
 }
 
 /// @brief Draw the bottom wall border
 void drawBottomWall(){
-    for (int i = 0; i < (width + 2); i+=2){
+    // regular terminal cell width
+    //for (int i = 0; i < (width + 2); i+=2){
+        //mvaddch(height + 2, i, topWallChar);
+        //mvaddch(height + 2, i+1, ' ');
+    //}
+
+    // square terminal cell width
+    for (int i = 0; i < (width + 2); i++){
         mvaddch(height + 2, i, topWallChar);
-        mvaddch(height + 2, i+1, ' ');
     }
 }
 
@@ -49,32 +62,39 @@ void drawInterior(){
         mvaddch(i, 0, sideWallChar);
 
         for (int j = 1; j < width + 1; j++)
-            if (y == i && x == j)                // check for snake
+            if (y == i && x == j)   // check for snake head
                 mvaddch(i, j, 'o');
+            
+            else if (fruitY == i && fruitX == j)    // check for fruit
+                mvaddch(i, j, 'x');
 
-            else if (fruitY == i && fruitX == j) // check for fruit
-                mvprintw(i, j, "x");
-
-            else                                 // print blank
-                mvaddch(i, j, ' ');
+            else{
+                bool isTail = false;
+                for (int k = 0; k < nTail; k++){
+                    if (tailX[k] == j && tailY[k] == i){
+                        mvaddch(i, j, 'o');
+                        isTail = true;
+                        break;
+                    }
+                }
+                if (isTail == false)    // print blank
+                    mvaddch(i, j, ' ');
+            }
 
         mvaddch(i, width + 1, sideWallChar);
     }
 }
 
-// /// @brief Check if player has won by checking winScore
-// bool gameWon(){
-    // if (score == winScore)
-        // return true;
-    // return false;
-// }
-
 /// @brief Print out the "You won!" screen
 void youWon(){
-    
+    mvprintw((height + 2)/2 + 1, (width+2)/2 - 4, "You won!"); 
+    refresh();
+    usleep(10000000);
 }
 
 /// @brief Print out the "You lost..." screen
 void youLost(){
-
+    mvprintw((height + 2)/2 + 1, (width+2)/2 - 5, "You lost..."); 
+    refresh();
+    usleep(10000000);
 }
