@@ -25,31 +25,45 @@ void draw(){
 }
 
 void input(){
+    if (inputProcessed)
+        return;
+
     int key = getch(); // get user input
 
     switch (key){
         case 'w':
         case 'W':
-            dir = up;
+            if (nTail == 0 || (nTail >= 1 && dir != down)){
+                dir = up;
+                inputProcessed = true;
+            }
             break;
         case 'a':
         case 'A':
-            dir = left;
+            if (nTail == 0 || (nTail >= 1 && dir != right)){
+                dir = left;
+                inputProcessed = true;
+            }
             break;
         case 's':
         case 'S':
-            dir = down;
+            if (nTail == 0 || (nTail >= 1 && dir != up)){
+                dir = down;
+                inputProcessed = true;
+            }
             break;
         case 'd':
         case 'D':
-            dir = right;
+            if (nTail == 0 || (nTail >= 1 && dir != left)){
+                dir = right;
+                inputProcessed = true;
+            }
             break;
         case 27: // escape key 
             gameOver = true; // eventually turn into gamePaused, so we can pause and resume;
             break;
         default:        // keep current direction
             break;
-        
     }
 }
 
@@ -136,6 +150,7 @@ void logic(){
             fruitY = 2 + rand() % height; 
         }
     }
+    inputProcessed = false; 
 }
 
 int main(){
@@ -154,7 +169,7 @@ int main(){
         if (score == winScore)
             gameOver = true;
         draw();
-        usleep(150000);
+        usleep(125000);
     }
 
     if (score == winScore)

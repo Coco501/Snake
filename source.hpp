@@ -20,7 +20,9 @@ int winScore = 10;
 // snake coordinates
 int tailX[100]; // tail x coord
 int tailY[100]; // tail y coord
-int nTail;      // number of tail segments
+int nTail = 0;      // number of tail segments
+
+bool inputProcessed = false;
 
 /// @brief Print the player's score, centered to the screen
 void printScore(){
